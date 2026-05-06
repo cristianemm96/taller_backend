@@ -1,6 +1,8 @@
 using ApiStock.Models;
 using Microsoft.AspNetCore.Mvc;
 
+[ApiController]
+[Route("api/[controller]")]
 class CategoriaController : ControllerBase
 {
     private readonly ICategoriaService _categoriaService;
@@ -11,25 +13,25 @@ class CategoriaController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Categoria>>> GetCategories()
+    public async Task<ActionResult<IEnumerable<Categoria>>> GetAll()
     {
-        var categories = await _categoriaService.GetAllAsync();
-        return Ok(categories);
+        var categorias = await _categoriaService.GetAllAsync();
+        return Ok(categorias);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Categoria>> GetCategoryById(int id){
-        var category = await _categoriaService.GetByIdAsync(id);
-        if (category == null)
+    public async Task<ActionResult<Categoria>> GetCategoriaById(int id){
+        var categoria = await _categoriaService.GetByIdAsync(id);
+        if (categoria == null)
             return NotFound();
-        return Ok(category);
+        return Ok(categoria);
     }
 
     [HttpPost]
     public async Task<ActionResult<Categoria>> Create(Categoria categoria)
     {
         var createdCategory = await _categoriaService.CreateAsync(categoria);
-        return CreatedAtAction(nameof(GetCategories), new { id = createdCategory.CategoriaId }, createdCategory);
+        return CreatedAtAction(nameof(GetAll), new { id = createdCategory.CategoriaId }, createdCategory);
     }
 
     [HttpPut("{id}")]
