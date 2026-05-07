@@ -1,7 +1,7 @@
 using ApiStock.Models;
 using Microsoft.EntityFrameworkCore;
 
-public class CategoriaService : ICategoriaService
+public class CategoriaService : IService<Categoria>
 {
     private readonly StockContext _context;
 
@@ -40,7 +40,7 @@ public class CategoriaService : ICategoriaService
     public async Task<Categoria> UpdateAsync(int id, Categoria categoria)
     {
         var existente = await _context.Categorias.FindAsync(id) ?? throw new InvalidOperationException("Categoria no existente");
-        _context.Entry(id).CurrentValues.SetValues(categoria);
+        _context.Categorias.Entry(existente).CurrentValues.SetValues(categoria);
         await _context.SaveChangesAsync();
         return existente;
     }

@@ -1,8 +1,7 @@
-using ApiStock.Interfaces;
 using ApiStock.Models;
 using Microsoft.EntityFrameworkCore;
 
-public class RepuestoService : IRepuestoService
+public class RepuestoService : IService<Repuesto>
 {
     private readonly StockContext _context;
     public RepuestoService(StockContext context)
@@ -11,9 +10,9 @@ public class RepuestoService : IRepuestoService
     }
     public async Task<Repuesto> CreateAsync(Repuesto repuesto)
     {
-        _context.Repuestos.Add(repuesto);
+        var nuevoRepuesto = await _context.Repuestos.AddAsync(repuesto);
         await _context.SaveChangesAsync();
-        return repuesto;
+        return nuevoRepuesto.Entity;
     }
 
     public async Task<Repuesto?> DeleteAsync(int id)

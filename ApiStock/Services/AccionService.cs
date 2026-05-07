@@ -1,6 +1,7 @@
 using ApiStock.Models;
+using Microsoft.EntityFrameworkCore;
 
-class AccionService : IAccionService
+class AccionService : IService<Accion>
 {
     private readonly StockContext _context;
 
@@ -8,29 +9,45 @@ class AccionService : IAccionService
     {
         _context = context;
     }
-    public async Task<Accion> CreateAsync(Accion accion)
+
+    public async Task<Accion> CreateAsync(Accion entidad)
     {
-       await _context.AddAsync(accion);
-       await _context.
+        var nuevaAccion = await _context.Acciones.AddAsync(entidad);
+        await _context.SaveChangesAsync();
+        return nuevaAccion.Entity;
     }
 
-    public Task<Accion?> DeleteAsync(int id)
+    public async Task<Accion?> DeleteAsync(int id)
     {
-        throw new NotImplementedException();
+        Accion? existente = await GetEntidad(id);
+        if (existente == null) return null;
+        _context.Acciones.Remove(existente);
+        await _context.SaveChangesAsync();
+        return existente;
     }
 
-    public Task<Accion[]> GetAllAsync()
+    public async Task<Accion[]> GetAllAsync()
     {
-        throw new NotImplementedException();
+        var acciones = await _context.Acciones.ToListAsync();
+        return [.. acciones];
     }
 
-    public Task<Accion?> GetByIdAsync(int id)
+    public async Task<Accion?> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        var accion = await _context.Acciones.FindAsync(id) ?? null;
+        return accion;
     }
 
-    public Task<Accion> UpdateAsync(int id, Accion accion)
+    public async Task<Accion> UpdateAsync(int id, Accion accion)
     {
-        throw new NotImplementedException();
+        Accion? existente = await GetEntidad(id) ?? throw new InvalidOperationException("Accion no existente");
+        _context.Acciones.Entry(existente).CurrentValues.SetValues(accion);
+        await _context.SaveChangesAsync();
+        return existente;
+    }
+
+    private async Task<Accion?> GetEntidad(int id)
+    {
+        return await _context.Acciones.FindAsync(id);
     }
 }
