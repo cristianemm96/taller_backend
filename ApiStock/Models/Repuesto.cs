@@ -9,10 +9,10 @@ public class Repuesto
     public int Id { get; set; }
     [Required]
     [MaxLength(100)]
-    public string NombreComponente { get; set; }
+    public string NombreComponente { get; set; } = string.Empty;
     [Required]
     [MaxLength(50)]
-    public string CodReferencia { get; set; }
+    public string CodReferencia { get; set; } = string.Empty;
     public int CategoriaId { get; set; }
     public virtual Categoria Categoria { get; set; }
     [Range(0, int.MaxValue, ErrorMessage = "El stock no puede ser negativo.")]

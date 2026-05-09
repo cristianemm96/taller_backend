@@ -1,5 +1,6 @@
 using ApiStock.Models;
 using Microsoft.EntityFrameworkCore;
+namespace ApiStock.Services;
 
 public class CategoriaService : IService<Categoria>
 {
@@ -19,7 +20,7 @@ public class CategoriaService : IService<Categoria>
     public async Task<Categoria?> DeleteAsync(int id)
     {
         var existente = await _context.Categorias.FindAsync(id);
-        if(existente == null) return null;
+        if (existente == null) return null;
         _context.Categorias.Remove(existente);
         await _context.SaveChangesAsync();
         return existente;

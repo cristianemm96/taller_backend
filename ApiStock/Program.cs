@@ -1,4 +1,3 @@
-using ApiStock.Interfaces;
 using ApiStock.Models;
 using ApiStock.Services;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +8,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IStockService, StockService>();  
 builder.Services.AddScoped<IService<Repuesto>, RepuestoService>();
 builder.Services.AddScoped<IService<Accion>, AccionService>();
+builder.Services.AddScoped<IService<Categoria>, CategoriaService>();
 builder.Services.AddControllers();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<StockContext>(options =>

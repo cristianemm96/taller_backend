@@ -7,7 +7,7 @@ public class Logs
     public int Id { get; set; }
     [Required]
     [MaxLength(200)]
-    public string Mensaje { get; set; }
+    public string Mensaje { get; set; } = string.Empty;
     [Required]
     public int UsuarioId { get; set; }
     public virtual Usuario Usuario { get; set; }

@@ -7,6 +7,6 @@ public class Categoria
     public int CategoriaId { get; set; }
     [Required]
     [MaxLength(60)]
-    public string Nombre { get; set; }
+    public string NombreCategoria { get; set; } = string.Empty;
     public virtual ICollection<Repuesto> Repuestos { get; set; }
 }

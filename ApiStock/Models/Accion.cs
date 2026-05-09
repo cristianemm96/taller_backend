@@ -9,9 +9,8 @@ public class Accion
     [Required]
     [MaxLength(100)]
 
-    public string Nombre { get; set; }
+    public string NombreAccion { get; set; } = string.Empty;
     [MaxLength(200)]
-    public string Descripcion { get; set; }
-    [Required]
-    public virtual ICollection<Logs> Logs { get; set; }
+    public string? Descripcion { get; set; } = string.Empty;
+    public virtual ICollection<Logs>? Logs { get; set; }
 }

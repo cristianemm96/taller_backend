@@ -1,3 +1,4 @@
+namespace ApiStock.Services;
 using ApiStock.Models;
 using Microsoft.EntityFrameworkCore;
 

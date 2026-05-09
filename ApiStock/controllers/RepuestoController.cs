@@ -1,8 +1,7 @@
+using ApiStock.Dto.Repuestos;
 using ApiStock.Interfaces;
 using ApiStock.Models;
-using ApiStock.Services;
 using Microsoft.AspNetCore.Mvc;
-
 namespace ApiStock.Controllers;
 
 
@@ -20,14 +19,14 @@ public class RepuestoController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Repuesto>>> GetAll()
+    public async Task<ActionResult<IEnumerable<RepuestoDto>>> GetAll()
     {
         var repuestos = await _repuestoService.GetAllAsync();
         return Ok(new { totalElementos = repuestos.Length, elementos = repuestos });
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Repuesto>> GetById(int id)
+    public async Task<ActionResult<RepuestoDto>> GetById(int id)
     {
         var repuesto = await _repuestoService.GetByIdAsync(id);
         if (repuesto == null)
@@ -36,23 +35,50 @@ public class RepuestoController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Repuesto>> Create(Repuesto repuesto)
+    public async Task<ActionResult<CreateRepuestoDto>> Create(CreateRepuestoDto dto)
     {
-        var createdRepuesto = await _repuestoService.CreateAsync(repuesto);
-        return CreatedAtAction(nameof(GetById), new { id = createdRepuesto.Id }, createdRepuesto);
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+        try
+        {
+            var nuevoRepuesto = new Repuesto
+            {
+                NombreComponente = dto.NombreComponente,
+                CodReferencia = dto.CodReferencia ?? string.Empty,
+                Stock = dto.Stock,
+                CategoriaId = dto.CategoriaId,
+                CajonId = dto.UbicacionCajon,
+                Activo = true
+            };
+            var createdRepuesto = await _repuestoService.CreateAsync(nuevoRepuesto);
+            return CreatedAtAction(nameof(GetById), new { id = createdRepuesto.Id }, createdRepuesto);
+        }
+        catch (Exception ex)
+        {
+             return StatusCode(500, new {mensaje = "Error interno al crear repuesto", error = ex.Message });
+        }
+
     }
 
     [HttpPut]
-    public async Task<IActionResult> Update(int id, Repuesto repuesto)
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateRepuestoDto dto)
     {
-        if (id != repuesto.Id)
-            return BadRequest();
+        try
+        {
+            var repuestoExistente = await _repuestoService.GetByIdAsync(id);
+            if (repuestoExistente == null) return NotFound();
+            repuestoExistente.NombreComponente = dto.NombreComponente;
+            repuestoExistente.CodReferencia = dto.CodReferencia ?? string.Empty;
+            repuestoExistente.CategoriaId = dto.CategoriaId;
+            repuestoExistente.CajonId = dto.CajonId;
+            repuestoExistente.Activo = dto.Activo;
+            await _repuestoService.UpdateAsync(id, repuestoExistente);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new {mensaje = "Error interno al actualizar los datos del repuesto", error = ex.Message});
+        }
 
-        var updated = await _repuestoService.UpdateAsync(id, repuesto);
-        if (updated == null)
-            return NotFound();
-
-        return NoContent();
     }
 
     [HttpDelete("{id}")]
@@ -66,7 +92,7 @@ public class RepuestoController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, "Error interno al borrar el repuesto: " + ex.Message);
+            return StatusCode(500, new {mensaje = "Error interno al borrar el repuesto", error = ex.Message});
         }
     }
 
@@ -87,7 +113,7 @@ public class RepuestoController : ControllerBase
     }
 
     [HttpGet("search")]
-    public async Task<ActionResult<IEnumerable<Repuesto>>> Search([FromQuery] string term)
+    public async Task<ActionResult<IEnumerable<RepuestoDto>>> Search([FromQuery] string term)
     {
         var repuestos = await _repuestoService.SearchByTermAsync(term);
         return Ok(new { totalElementos = repuestos.Length, elementos = repuestos });

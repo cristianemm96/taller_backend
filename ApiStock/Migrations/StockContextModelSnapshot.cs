@@ -31,11 +31,10 @@ namespace ApiStock.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AccionId"));
 
                     b.Property<string>("Descripcion")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<string>("Nombre")
+                    b.Property<string>("NombreAccion")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
@@ -52,6 +51,10 @@ namespace ApiStock.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CajonId"));
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int>("EstanteriaId")
                         .HasColumnType("integer");
@@ -74,7 +77,7 @@ namespace ApiStock.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CategoriaId"));
 
-                    b.Property<string>("Nombre")
+                    b.Property<string>("NombreCategoria")
                         .IsRequired()
                         .HasMaxLength(60)
                         .HasColumnType("character varying(60)");
@@ -92,12 +95,16 @@ namespace ApiStock.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("EstanteriaId"));
 
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("EstanteriaId");
 
                     b.ToTable("Estanterias");
                 });
 
-            modelBuilder.Entity("ApiStock.Models.Log", b =>
+            modelBuilder.Entity("ApiStock.Models.Logs", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -174,29 +181,33 @@ namespace ApiStock.Migrations
 
             modelBuilder.Entity("ApiStock.Models.Rol", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("RolId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RolId"));
+
+                    b.Property<string>("Descripcion")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.HasKey("Id");
+                    b.HasKey("RolId");
 
                     b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("ApiStock.Models.Usuario", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("UsuarioId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UsuarioId"));
 
                     b.Property<bool>("Activo")
                         .HasColumnType("boolean");
@@ -219,10 +230,13 @@ namespace ApiStock.Migrations
                     b.Property<int>("RolId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Telefono")
+                        .HasColumnType("text");
+
                     b.Property<string>("UrlFoto")
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("UsuarioId");
 
                     b.HasIndex("RolId");
 
@@ -240,7 +254,7 @@ namespace ApiStock.Migrations
                     b.Navigation("Estanteria");
                 });
 
-            modelBuilder.Entity("ApiStock.Models.Log", b =>
+            modelBuilder.Entity("ApiStock.Models.Logs", b =>
                 {
                     b.HasOne("ApiStock.Models.Accion", "AccionDetalle")
                         .WithMany("Logs")
