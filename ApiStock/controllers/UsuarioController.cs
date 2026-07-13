@@ -2,8 +2,11 @@ using ApiStock.Dto.Usuario;
 using ApiStock.Models;
 using Microsoft.AspNetCore.Mvc;
 using BCrypt.Net;
+using ApiStock.Interfaces;
 namespace ApiStock.Controllers;
 
+[ApiController]
+[Route("api/[controller]")]
 public class UsuarioController : ControllerBase
 {
     private readonly IService<Usuario> _usuarioService;
@@ -51,7 +54,6 @@ public class UsuarioController : ControllerBase
                 UsuarioId = usuarioCreado.UsuarioId,
                 Nombre = usuarioCreado.Nombre,
                 Email = usuarioCreado.Email,
-                UrlFoto = usuarioCreado.UrlFoto,
                 NombreRol = usuarioCreado.Rol?.Nombre ?? "Sin Rol",
                 Activo = usuarioCreado.Activo
             };
@@ -64,24 +66,24 @@ public class UsuarioController : ControllerBase
     }
 
     [HttpPut("{id}")]
-public async Task<IActionResult> Update(int id, [FromBody] UpdateUsuarioDto dto)
-{
-    if (id != dto.UsuarioId) return BadRequest("El ID de la URL no coincide con el del cuerpo.");
-    if (!ModelState.IsValid) return BadRequest(ModelState);
-    try
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateUsuarioDto dto)
     {
-        var usuarioExistente = await _usuarioService.GetByIdAsync(id);
-        if (usuarioExistente == null) return NotFound("Usuario no encontrado.");
-        usuarioExistente.Nombre = dto.Nombre;
-        usuarioExistente.UrlFoto = dto.UrlFoto;
-        usuarioExistente.RolId = dto.RolId;
-        usuarioExistente.Activo = dto.Activo;
-        await _usuarioService.UpdateAsync(id, usuarioExistente);
-        return NoContent(); 
+        if (id != dto.UsuarioId) return BadRequest("El ID de la URL no coincide con el del cuerpo.");
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+        try
+        {
+            var usuarioExistente = await _usuarioService.GetByIdAsync(id);
+            if (usuarioExistente == null) return NotFound("Usuario no encontrado.");
+            usuarioExistente.Nombre = dto.Nombre;
+            usuarioExistente.UrlFoto = dto.UrlFoto;
+            usuarioExistente.RolId = dto.RolId;
+            usuarioExistente.Activo = dto.Activo;
+            await _usuarioService.UpdateAsync(id, usuarioExistente);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { mensaje = "Error al actualizar", error = ex.Message });
+        }
     }
-    catch (Exception ex)
-    {
-        return StatusCode(500, new { mensaje = "Error al actualizar", error = ex.Message });
-    }
-}
 }

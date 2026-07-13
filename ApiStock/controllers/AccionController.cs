@@ -1,6 +1,6 @@
 namespace ApiStock.Controllers;
-
 using ApiStock.Dto.Accion;
+using ApiStock.Interfaces;
 using ApiStock.Models;
 using Microsoft.AspNetCore.Mvc;
 

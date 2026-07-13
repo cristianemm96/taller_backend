@@ -1,4 +1,5 @@
 using ApiStock.Dto.Cajon;
+using ApiStock.Interfaces;
 using ApiStock.Models;
 using Microsoft.AspNetCore.Mvc;
 

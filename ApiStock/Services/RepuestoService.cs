@@ -1,8 +1,10 @@
 namespace ApiStock.Services;
+
+using ApiStock.Interfaces;
 using ApiStock.Models;
 using Microsoft.EntityFrameworkCore;
 
-public class RepuestoService : IService<Repuesto>
+public class RepuestoService : IRepuestoService
 {
     private readonly StockContext _context;
     public RepuestoService(StockContext context)
@@ -28,8 +30,13 @@ public class RepuestoService : IService<Repuesto>
 
     public async Task<Repuesto[]> GetAllAsync()
     {
-        var repuestos = await _context.Repuestos.ToListAsync();
-        return [.. repuestos];
+        var repuestos = await _context.Repuestos
+        .Include(r => r.Categoria)
+        .Include(r => r.Cajon)
+            .ThenInclude(c => c.Estanteria) 
+        .ToListAsync();
+
+    return [.. repuestos];
     }
 
     public async Task<Repuesto?> GetByIdAsync(int id)

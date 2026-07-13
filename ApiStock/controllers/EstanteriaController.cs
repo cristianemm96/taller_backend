@@ -1,4 +1,6 @@
+using ApiStock.Dto.Cajon;
 using ApiStock.Dto.Estanteria;
+using ApiStock.Interfaces;
 using ApiStock.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,9 +10,9 @@ namespace ApiStock.Controllers;
 [Route("/api/[controller]")]
 public class EstanteriaController : ControllerBase
 {
-    private readonly IService<Estanteria> _estanteriaService;
+    private readonly IEstanteriaService _estanteriaService;
 
-    public EstanteriaController(IService<Estanteria> service)
+    public EstanteriaController(IEstanteriaService service)
     {
         _estanteriaService = service;
     }
@@ -49,7 +51,19 @@ public class EstanteriaController : ControllerBase
 
             var creada = await _estanteriaService.CreateAsync(nuevaEstanteria);
 
-            return CreatedAtAction(nameof(GetById), new { id = creada.EstanteriaId }, creada);
+            var responseDto = new EstanteriaDto
+            {
+                EstanteriaId = creada.EstanteriaId,
+                Nombre = creada.Nombre,
+                Cajones = creada.Cajones.Select(c => new CajonDto
+                {
+                    CajonId = c.CajonId,
+                    Codigo = c.Codigo,
+                    Ocupado = c.Ocupado
+                }).ToList()
+            };
+
+            return CreatedAtAction(nameof(GetById), new { id = responseDto.EstanteriaId }, responseDto);
         }
         catch (Exception ex)
         {
@@ -70,7 +84,39 @@ public class EstanteriaController : ControllerBase
         {
             return StatusCode(500, new { mensaje = "Error al eliminar estantería", error = ex.Message });
         }
-
-
     }
+
+    [HttpGet("{estanteriaId}/cajones")]
+    public async Task<ActionResult> GetCajones(int estanteriaId)
+    {
+        try
+        {
+            var cajones = await _estanteriaService.GetCajonesByEstanteriaIdAsync(estanteriaId);
+            var response = cajones.Select(c => new
+            {
+                cajonId = c.CajonId,
+                codigo = c.Codigo,
+                cantidadRepuestos = c.Repuestos?.Count ?? 0
+            });
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { mensaje = "Error al obtener los cajones", error = ex.Message });
+        }
+    }
+    [HttpGet("mapa")]
+    public async Task<IActionResult> GetMapa()
+    {
+        try
+        {
+            var resultado = await _estanteriaService.ObtenerMapaEstanteriasAsync();
+            return Ok(resultado);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
 }

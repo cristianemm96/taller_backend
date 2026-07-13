@@ -1,4 +1,5 @@
 using ApiStock.Dto.Categoria;
+using ApiStock.Interfaces;
 using ApiStock.Models;
 using Microsoft.AspNetCore.Mvc;
 namespace ApiStock.Controllers;

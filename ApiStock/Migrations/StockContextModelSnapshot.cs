@@ -140,6 +140,54 @@ namespace ApiStock.Migrations
                     b.ToTable("Logs");
                 });
 
+            modelBuilder.Entity("ApiStock.Models.OrdenTrabajo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("DescripcionTrabajo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrdenesTrabajo");
+                });
+
+            modelBuilder.Entity("ApiStock.Models.OrdenTrabajoUsuario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("OrdenTrabajoId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrdenTrabajoId")
+                        .IsUnique();
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("OrdenesTrabajoUsuarios");
+                });
+
             modelBuilder.Entity("ApiStock.Models.Repuesto", b =>
                 {
                     b.Property<int>("Id")
@@ -167,7 +215,10 @@ namespace ApiStock.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<int>("Stock")
+                    b.Property<int>("StockFisico")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("StockReservado")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -243,6 +294,32 @@ namespace ApiStock.Migrations
                     b.ToTable("Usuarios");
                 });
 
+            modelBuilder.Entity("DetalleOrden", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("OrdenTrabajoId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RepuestoId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrdenTrabajoId");
+
+                    b.HasIndex("RepuestoId");
+
+                    b.ToTable("DetallesOrden");
+                });
+
             modelBuilder.Entity("ApiStock.Models.Cajon", b =>
                 {
                     b.HasOne("ApiStock.Models.Estanteria", "Estanteria")
@@ -279,6 +356,25 @@ namespace ApiStock.Migrations
                     b.Navigation("Usuario");
                 });
 
+            modelBuilder.Entity("ApiStock.Models.OrdenTrabajoUsuario", b =>
+                {
+                    b.HasOne("ApiStock.Models.OrdenTrabajo", "OrdenTrabajo")
+                        .WithOne("MecanicoAsignado")
+                        .HasForeignKey("ApiStock.Models.OrdenTrabajoUsuario", "OrdenTrabajoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ApiStock.Models.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OrdenTrabajo");
+
+                    b.Navigation("Usuario");
+                });
+
             modelBuilder.Entity("ApiStock.Models.Repuesto", b =>
                 {
                     b.HasOne("ApiStock.Models.Cajon", "Cajon")
@@ -309,6 +405,25 @@ namespace ApiStock.Migrations
                     b.Navigation("Rol");
                 });
 
+            modelBuilder.Entity("DetalleOrden", b =>
+                {
+                    b.HasOne("ApiStock.Models.OrdenTrabajo", "OrdenTrabajo")
+                        .WithMany("Detalles")
+                        .HasForeignKey("OrdenTrabajoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ApiStock.Models.Repuesto", "Repuesto")
+                        .WithMany()
+                        .HasForeignKey("RepuestoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OrdenTrabajo");
+
+                    b.Navigation("Repuesto");
+                });
+
             modelBuilder.Entity("ApiStock.Models.Accion", b =>
                 {
                     b.Navigation("Logs");
@@ -327,6 +442,14 @@ namespace ApiStock.Migrations
             modelBuilder.Entity("ApiStock.Models.Estanteria", b =>
                 {
                     b.Navigation("Cajones");
+                });
+
+            modelBuilder.Entity("ApiStock.Models.OrdenTrabajo", b =>
+                {
+                    b.Navigation("Detalles");
+
+                    b.Navigation("MecanicoAsignado")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ApiStock.Models.Rol", b =>

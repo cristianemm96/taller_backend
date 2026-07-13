@@ -19,10 +19,25 @@ public class RepuestoController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<RepuestoDto>>> GetAll()
+    public async Task<ActionResult<IEnumerable<RepuestoGetDto>>> GetAll()
     {
         var repuestos = await _repuestoService.GetAllAsync();
-        return Ok(new { totalElementos = repuestos.Length, elementos = repuestos });
+        var dto = repuestos.Select(r => new RepuestoGetDto
+        {
+            Id = r.Id,
+            CodReferencia = r.CodReferencia,
+            NombreComponente = r.NombreComponente,
+            StockDisponible = r.StockDisponible,
+            StockFisico = r.StockFisico,
+            //CategoriaId = r.CategoriaId,
+            NombreCategoria = r.Categoria != null ? r.Categoria.NombreCategoria : "Sin Categoría",
+            CajonId = r.CajonId,
+            EstanteriaId = r.Cajon != null ? r.Cajon.EstanteriaId : 0,
+            CodigoCajon = r.Cajon != null ? r.Cajon.Codigo : "",
+            NombreEstanteria = (r.Cajon != null && r.Cajon.Estanteria != null) ? r.Cajon.Estanteria.Nombre : "Sin Estante"
+        }).ToArray();
+
+        return Ok(new { totalElementos = repuestos.Length, elementos = dto });
     }
 
     [HttpGet("{id}")]
@@ -44,7 +59,8 @@ public class RepuestoController : ControllerBase
             {
                 NombreComponente = dto.NombreComponente,
                 CodReferencia = dto.CodReferencia ?? string.Empty,
-                Stock = dto.Stock,
+                StockFisico = dto.StockInicial,
+                StockReservado = 0,
                 CategoriaId = dto.CategoriaId,
                 CajonId = dto.UbicacionCajon,
                 Activo = true
@@ -54,7 +70,7 @@ public class RepuestoController : ControllerBase
         }
         catch (Exception ex)
         {
-             return StatusCode(500, new {mensaje = "Error interno al crear repuesto", error = ex.Message });
+            return StatusCode(500, new { mensaje = "Error interno al crear repuesto", error = ex.Message });
         }
 
     }
@@ -76,7 +92,7 @@ public class RepuestoController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new {mensaje = "Error interno al actualizar los datos del repuesto", error = ex.Message});
+            return StatusCode(500, new { mensaje = "Error interno al actualizar los datos del repuesto", error = ex.Message });
         }
 
     }
@@ -92,7 +108,7 @@ public class RepuestoController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new {mensaje = "Error interno al borrar el repuesto", error = ex.Message});
+            return StatusCode(500, new { mensaje = "Error interno al borrar el repuesto", error = ex.Message });
         }
     }
 

@@ -1,4 +1,5 @@
 
+using ApiStock.Interfaces;
 using ApiStock.Models;
 using Microsoft.EntityFrameworkCore;
 

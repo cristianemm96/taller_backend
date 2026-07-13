@@ -8,7 +8,7 @@ public class CreateRepuestoDto
     public string? CodReferencia { get; set; } = string.Empty;
 
     [Range(0, int.MaxValue)]
-    public int Stock { get; set; }
+    public int StockInicial { get; set; }
 
     public int CategoriaId { get; set; }
     public int UbicacionCajon { get; set; }
