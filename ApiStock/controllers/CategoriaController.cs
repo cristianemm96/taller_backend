@@ -1,11 +1,13 @@
 using ApiStock.Dto.Categoria;
 using ApiStock.Interfaces;
 using ApiStock.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace ApiStock.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin")]
 public class CategoriaController : ControllerBase
 {
     private readonly IService<Categoria> _categoriaService;

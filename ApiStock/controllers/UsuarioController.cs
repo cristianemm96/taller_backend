@@ -3,10 +3,12 @@ using ApiStock.Models;
 using Microsoft.AspNetCore.Mvc;
 using BCrypt.Net;
 using ApiStock.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 namespace ApiStock.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin")]
 public class UsuarioController : ControllerBase
 {
     private readonly IService<Usuario> _usuarioService;

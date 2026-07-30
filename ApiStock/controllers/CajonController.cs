@@ -1,11 +1,13 @@
 using ApiStock.Dto.Cajon;
 using ApiStock.Interfaces;
 using ApiStock.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiStock.Controllers;
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin")]
 public class CajonController : ControllerBase
 {
     private readonly IService<Cajon> _cajonService;
