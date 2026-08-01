@@ -1,4 +1,5 @@
 using ApiStock.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 namespace ApiStock.Controllers;
@@ -15,6 +16,7 @@ public class OrdenesController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,Mecanico")]
     public async Task<IActionResult> GetAll()
     {
         var ordenes = await _context.OrdenesTrabajo
@@ -29,6 +31,7 @@ public class OrdenesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromBody] OrdenTrabajo nuevaOrden)
     {
         if (nuevaOrden == null) return BadRequest("Datos de la orden de competición inválidos.");
@@ -64,6 +67,7 @@ public class OrdenesController : ControllerBase
     }
 
     [HttpPost("{id}/finalizar")]
+    [Authorize(Roles = "Admin,Mecanico")]
     public async Task<IActionResult> FinalizarOrden(int id)
     {
         var orden = await _context.OrdenesTrabajo

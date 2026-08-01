@@ -2,12 +2,14 @@ using ApiStock.Dto.Cajon;
 using ApiStock.Dto.Estanteria;
 using ApiStock.Interfaces;
 using ApiStock.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiStock.Controllers;
 
 [ApiController]
 [Route("/api/[controller]")]
+[Authorize(Roles = "Admin")]
 public class EstanteriaController : ControllerBase
 {
     private readonly IEstanteriaService _estanteriaService;

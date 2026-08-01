@@ -2,10 +2,12 @@ using ApiStock.Dto.Usuario;
 using ApiStock.Models;
 using Microsoft.AspNetCore.Mvc;
 using ApiStock.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 namespace ApiStock.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin")]
 public class UsuarioController : ControllerBase
 {
     private readonly IService<Usuario> _usuarioService;

@@ -8,3 +8,5 @@ public class OrdenTrabajoUsuario
     public int UsuarioId { get; set; } 
     public Usuario? Usuario { get; set; } 
 }
+
+
