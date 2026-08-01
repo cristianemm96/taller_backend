@@ -9,9 +9,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IStockService, StockService>();  
 builder.Services.AddScoped<IRepuestoService, RepuestoService>();
 builder.Services.AddScoped<IService<Accion>, AccionService>();
+builder.Services.AddScoped<IService<Rol>, RolService>();
 builder.Services.AddScoped<IService<Categoria>, CategoriaService>();
 builder.Services.AddScoped<IEstanteriaService, EstanteriaService>();
 builder.Services.AddScoped<IService<Usuario>, UsuarioService>();
+builder.Services.AddScoped<OrdenTrabajoService>();
 builder.Services.AddControllers().AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;

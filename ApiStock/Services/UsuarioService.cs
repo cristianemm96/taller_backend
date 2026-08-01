@@ -1,3 +1,4 @@
+using ApiStock.Dto.Usuario;
 using ApiStock.Interfaces;
 using ApiStock.Models;
 using Microsoft.EntityFrameworkCore;
@@ -29,8 +30,11 @@ public class UsuarioService : IService<Usuario>
 
     public async Task<Usuario[]> GetAllAsync()
     {
-        var usuarios = await _context.Usuarios.ToListAsync();
-        return [..usuarios];
+      return await _context.Usuarios
+        .Include(u => u.Rol)
+        .ToListAsync() 
+        .ContinueWith(t => t.Result.ToArray());
+           
     }
 
     public async Task<Usuario?> GetByIdAsync(int id)
@@ -43,4 +47,5 @@ public class UsuarioService : IService<Usuario>
     {
         throw new NotImplementedException();
     }
+
 }

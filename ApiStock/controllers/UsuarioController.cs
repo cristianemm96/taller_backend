@@ -1,7 +1,6 @@
 using ApiStock.Dto.Usuario;
 using ApiStock.Models;
 using Microsoft.AspNetCore.Mvc;
-using BCrypt.Net;
 using ApiStock.Interfaces;
 namespace ApiStock.Controllers;
 
@@ -20,7 +19,16 @@ public class UsuarioController : ControllerBase
     public async Task<ActionResult<IEnumerable<UsuarioDto>>> GetAll()
     {
         var usuarios = await _usuarioService.GetAllAsync();
-        return Ok(new { totalElementos = usuarios.Length, elementos = usuarios });
+        var elementosDto = usuarios.Select(u => new UsuarioDto
+    {
+        Id = u.UsuarioId,
+        Nombre = u.Nombre,
+        Email = u.Email,
+        Telefono = u.Telefono,
+        Rol = u.Rol != null ? u.Rol.Nombre.ToLower() : "sin rol", 
+         Activo = u.Activo,
+    }).ToArray();
+        return Ok(new { totalElementos = usuarios.Length, elementos = elementosDto });
     }
 
     [HttpGet("{id}")]
@@ -42,8 +50,8 @@ public class UsuarioController : ControllerBase
             {
                 Nombre = dto.Nombre,
                 Email = dto.Email,
+                Telefono = dto.Telefono,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-                UrlFoto = dto.UrlFoto,
                 RolId = dto.RolId,
                 Activo = true
             };
@@ -51,13 +59,14 @@ public class UsuarioController : ControllerBase
             var usuarioCreado = await _usuarioService.CreateAsync(nuevoUsuario);
             var responseDto = new UsuarioDto
             {
-                UsuarioId = usuarioCreado.UsuarioId,
+                Id = usuarioCreado.UsuarioId,
                 Nombre = usuarioCreado.Nombre,
+                Telefono = usuarioCreado.Telefono,
                 Email = usuarioCreado.Email,
-                NombreRol = usuarioCreado.Rol?.Nombre ?? "Sin Rol",
+                Rol = usuarioCreado.Rol?.Nombre ?? "Sin Rol",
                 Activo = usuarioCreado.Activo
             };
-            return CreatedAtAction(nameof(GetById), new { id = responseDto.UsuarioId }, responseDto);
+            return CreatedAtAction(nameof(GetById), new { id = responseDto.Id }, responseDto);
         }
         catch (Exception ex)
         {
@@ -84,6 +93,21 @@ public class UsuarioController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, new { mensaje = "Error al actualizar", error = ex.Message });
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        try
+        {
+            var eliminada = await _usuarioService.DeleteAsync(id);
+            if(eliminada == null) return NotFound();
+            return Ok(eliminada);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new {mensaje = "Error al intentar borrar usuario", error = ex.Message});
         }
     }
 }

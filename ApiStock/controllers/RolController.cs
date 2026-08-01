@@ -40,7 +40,7 @@ public class RolController : ControllerBase
                 Nombre = dto.Nombre
             };
             var rolCreado = await _rolService.CreateAsync(nuevoRol);
-            return CreatedAtAction(nameof(GetRolById), new { id = nuevoRol.RolId, rolCreado });
+            return StatusCode(201, nuevoRol); 
         }
         catch (Exception ex)
         {
