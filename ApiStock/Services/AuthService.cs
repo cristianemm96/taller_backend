@@ -22,25 +22,25 @@ namespace ApiStock.Services
 
         public async Task<AuthResponseDto?> LoginAsync(LoginDto loginDto)
         {
-           
+
             var usuario = await _context.Usuarios
                 .Include(u => u.Rol)
                 .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
 
-           
+
             if (usuario == null || !usuario.Activo)
             {
                 return null;
             }
 
-           
-            bool esPasswordValida = usuario.PasswordHash == loginDto.Password; 
+
+            bool esPasswordValida = BCrypt.Net.BCrypt.Verify(loginDto.Password, usuario.PasswordHash);
             if (!esPasswordValida)
             {
                 return null;
             }
 
-          
+
             var token = GenerarJwtToken(usuario);
 
             return new AuthResponseDto
@@ -48,7 +48,8 @@ namespace ApiStock.Services
                 Token = token,
                 Email = usuario.Email,
                 Nombre = usuario.Nombre,
-                Rol = usuario.Rol?.Nombre ?? "SinRol"
+                Rol = usuario.Rol?.Nombre ?? "SinRol",
+                Id= usuario.UsuarioId
             };
         }
 
@@ -56,20 +57,21 @@ namespace ApiStock.Services
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            string rolTexto = usuario.Rol?.Nombre?.Trim() ?? "Mecanico";
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, usuario.UsuarioId.ToString()),
-                new Claim(ClaimTypes.Email, usuario.Email),
-                new Claim(ClaimTypes.Name, usuario.Nombre),
-                new Claim(ClaimTypes.Role, usuario.Rol?.Nombre ?? "Mecanico")
+                new Claim("sub", usuario.UsuarioId.ToString()),
+                new Claim("email", usuario.Email),
+                new Claim("name", usuario.Nombre),
+                new Claim("role", rolTexto)
             };
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(8), 
+                expires: DateTime.UtcNow.AddHours(8),
                 signingCredentials: creds
             );
 

@@ -9,7 +9,7 @@ namespace ApiStock.Controllers;
 
 [ApiController]
 [Route("/api/[controller]")]
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Encargado")]
 public class EstanteriaController : ControllerBase
 {
     private readonly IEstanteriaService _estanteriaService;

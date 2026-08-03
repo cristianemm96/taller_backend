@@ -7,14 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace ApiStock.Controllers;
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Encargado")]
 public class CajonController : ControllerBase
 {
     private readonly IService<Cajon> _cajonService;
 
     public CajonController(IService<Cajon> cajonService)
     {
-        _cajonService = cajonService;
+        _cajonService = cajonService; 
     }
 
     [HttpGet("{id}")]

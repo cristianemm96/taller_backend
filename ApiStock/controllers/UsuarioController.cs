@@ -7,7 +7,7 @@ namespace ApiStock.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Encargado")]
 public class UsuarioController : ControllerBase
 {
     private readonly IService<Usuario> _usuarioService;

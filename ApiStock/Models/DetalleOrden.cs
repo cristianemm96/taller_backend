@@ -10,5 +10,5 @@ public class DetalleOrden
     public int RepuestoId { get; set; }
     public Repuesto? Repuesto { get; set; }
 
-    public int Cantidad { get; set; } // Unidades reservadas para la carrera/mantenimiento
+    public int Cantidad { get; set; } 
 }

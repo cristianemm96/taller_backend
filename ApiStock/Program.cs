@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 
+System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -17,7 +18,7 @@ builder.Services.AddScoped<IService<Rol>, RolService>();
 builder.Services.AddScoped<IService<Categoria>, CategoriaService>();
 builder.Services.AddScoped<IEstanteriaService, EstanteriaService>();
 builder.Services.AddScoped<IService<Usuario>, UsuarioService>();
-builder.Services.AddScoped<OrdenTrabajoService>();
+builder.Services.AddScoped<IOrdenTrabajoService, OrdenTrabajoService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddControllers().AddJsonOptions(options =>
     {
@@ -69,6 +70,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        options.MapInboundClaims = false;//esto!!
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -77,6 +79,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
+            RoleClaimType = "role",
+            NameClaimType = "name",
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
         };
     });
@@ -93,7 +97,16 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.Use(async (context, next) =>
+{
+    // Imprime la ruta y la cabecera de autorización que llegó
+    var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+    Console.WriteLine($"--- PETICIÓN RECIBIDA ---");
+    Console.WriteLine($"Ruta: {context.Request.Path}");
+    Console.WriteLine($"Authorization Header: {authHeader ?? "NO LLEGÓ TOKEN"}");
+    
+    await next();
+});
 app.UseCors("PermitirFlutterWeb");
 app.UseAuthentication();
 app.UseAuthorization();

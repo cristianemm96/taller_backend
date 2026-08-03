@@ -8,6 +8,7 @@ namespace ApiStock.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+
 public class RepuestoController : ControllerBase
 {
     private readonly IRepuestoService _repuestoService;
@@ -20,7 +21,7 @@ public class RepuestoController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Admin,Mecanico")]
+    [Authorize(Roles = "Encargado, Mecanico")]
     public async Task<ActionResult<IEnumerable<RepuestoGetDto>>> GetAll()
     {
         var repuestos = await _repuestoService.GetAllAsync();
@@ -43,7 +44,7 @@ public class RepuestoController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [Authorize(Roles = "Admin,Mecanico")]
+    [Authorize(Roles = "Encargado")]
     public async Task<ActionResult<RepuestoDto>> GetById(int id)
     {
         var repuesto = await _repuestoService.GetByIdAsync(id);
@@ -53,7 +54,7 @@ public class RepuestoController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Encargado")]
     public async Task<ActionResult<CreateRepuestoDto>> Create(CreateRepuestoDto dto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -80,7 +81,7 @@ public class RepuestoController : ControllerBase
     }
 
     [HttpPut]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Encargado")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateRepuestoDto dto)
     {
         try
@@ -103,7 +104,7 @@ public class RepuestoController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Encargado")]
     public async Task<IActionResult> Delete(int id)
     {
         try
@@ -119,7 +120,7 @@ public class RepuestoController : ControllerBase
     }
 
     [HttpPatch("{id}/mover")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Encargado")]
     public async Task<IActionResult> Mover(int id, [FromBody] int nuevoCajonId)
     {
         int usuarioIdSimulado = 1;
@@ -136,7 +137,7 @@ public class RepuestoController : ControllerBase
     }
 
     [HttpGet("search")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Encargado, Mecanico")]
     public async Task<ActionResult<IEnumerable<RepuestoDto>>> Search([FromQuery] string term)
     {
         var repuestos = await _repuestoService.SearchByTermAsync(term);
